@@ -1,6 +1,6 @@
 # CTData Preparation for Laryngeal CT Imaging
 
-TODO: Write something to introduce the project
+Despite the rich body of research in head and neck cancer, laryngeal cancer imaging lacks a dedicated public dataset for model development and comparison. We introduce the first curated laryngeal cancer dataset derived from six prominent Cancer Image Archive (TCIA) collections. To support efficient model training and reduce computational overhead, we extracted 1 mm isotropic volumes centered on the laryngeal region, extending from the epiglottis to the cricoid cartilage. Comprising 1,029 computed tomography (CT) images, our benchmark dataset is constructed through a reproducible and fully documented workflow. Though direct image sharing is restricted by TCIA licensing, we release detailed cropping parameters and an open-source image processing pipeline to regenerate the dataset from TCIA originals. This work aims to facilitate reproducible research in segmentation, classification, and prognostic modelling for laryngeal cancer by promoting collaboration and progress in this underrepresented domain.
 
 ### STEP 0: Download Datasets from https://www.cancerimagingarchive.net
 
@@ -19,3 +19,5 @@ pip install SimpleITK pydicom pynrrd numpy
 
 ## Run
 python dataprep.py
+
+## The result will be a set of cropped 3D images in .nrrd formats, stored in "cropped_nrrds" folder. We also provide the labels for classification to different stages in "data/annotations/LaryngealCT_metadata.xlsx". This would help to train a deep learning model.
