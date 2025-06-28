@@ -9,10 +9,11 @@ import glob
 import os
 import SimpleITK as sitk
 
+
 DATA_DIR   = "./data"
 ANNO_DIR   = os.path.join(DATA_DIR,"annotations")
-IMG_LIST   = os.path.join(ANN_DIR,"img_list.txt")
-BOX3D_DIR  = os.path.join(ANNO_DIR,"box3d")
+IMG_LIST   = os.path.join(ANNO_DIR,"img_list.txt")
+BOX3D_LIST  = os.path.join(ANNO_DIR,"bbox3d.txt")
 LABEL_FILE = os.path.join(ANNO_DIR,"labels.txt") # TODO
 
 TCIA_DIR   = os.path.join(DATA_DIR,"tcia");
@@ -20,6 +21,13 @@ TCIA_DIR   = os.path.join(DATA_DIR,"tcia");
 TEMP       = os.path.join(DATA_DIR,"temp")
 NRRD_DIR   = os.path.join(DATA_DIR,"cropped_nrrds")
 
+if not os.path.isdir(TEMP):
+    os.mkdir(TEMP)
+
+if not os.path.isdir(NRRD_DIR):
+    os.mkdir(NRRD_DIR)
+
+    
 def imsim(img1,img2,method="mse"):
     if method=="mse":
         img1 = (img1-np.min(img1))/(np.max(img1)-np.min(img1))
@@ -45,6 +53,26 @@ def show_slice(img3d,inds=None):
     plt.imshow(img,cmap='gray',aspect="auto")
              
     plt.show()
+
+def show_slices(nrrd_file):
+    img3d = read_nrrd(nrrd_file)
+    
+    inds = [img3d.shape[0]//2,img3d.shape[1]//2,img3d.shape[2]//2]
+        
+    a1 = plt.subplot(1, 3, 1)
+    img = img3d[inds[0], :, :]
+    plt.imshow(img,cmap='gray',aspect="auto")
+                
+    a3 = plt.subplot(1, 3, 2)
+    img = img3d[:, inds[1], :]
+    plt.imshow(img,cmap='gray',aspect="auto")
+
+    a2 = plt.subplot(1, 3, 3)
+    img = img3d[:, :, inds[2]]
+    plt.imshow(img,cmap='gray',aspect="auto")
+             
+    plt.show()
+    
         
 def read_nrrd(nrrd_file):
     cropped3D, header = nrrd.read(nrrd_file,index_order="F")
@@ -98,40 +126,59 @@ def read_dicom(dcm_folder):
 
     return img3d
 
-def crop3D(img_name):
-    pos,shape = read_3dbox(os.path.join(BOX3D_DIR,img_name))
-    
-    x = pos[0]
-    y = pos[1]
-    z = pos[2]
+def crop3D(img_name,bbox):
+    img_name = img_name.replace("_","-")
+    print("Crop %s ..."%(img_name))
 
-    cimg = np.zeros(shape)
-    for zi in range(z,z+shape[2]):
-        img = img3d[x:xi+shape[0],y:y+shape[1],zi]
+    x = bbox[0]
+    y = bbox[1]
+    z = bbox[2]
+
+    lx = bbox[3]
+    ly = bbox[4]
+    lz = bbox[5]
+    
+    cimg = np.zeros((lx,ly,lz))
+    full_size_nrrd = os.path.join(TEMP,img_name)+".nrrd"
+    
+    if not os.path.isfile(full_size_nrrd):
+        print(f"{img_name} is not found")
+        return
+
+    img3d = read_nrrd(full_size_nrrd)
+    #print(cimg.shape)
+    #print((z,z+lz))
+    for zi in range(lz):
+        img = img3d[x:x+lx,y:y+ly,z+zi]
         img = np.flip(img,axis=0)
         img = np.flip(img,axis=1)
 
-        cimg[:,:,i] = img
+        cimg[:,:,zi] = img
 
     # now save it to nrrd
-    # TODO, save the image to nrdd
     nrrd_file = os.path.join(NRRD_DIR,img_name+"_Cropped_Volume.nrrd")
+    nrrd.write(nrrd_file, cimg)
     
 def crop():
-    box_names = glob.glob(BOX3D_DIR)
+    print("Start cropping images ...")
+    f = open(BOX3D_LIST,"r")
+    while True:
+        line = f.readline().strip()
+        if line is None or len(line)==0:
+            break
+        data = line.split(",")
+        #print(data)
+        img_name = data[0]
+        bbox = [int(data[1]),int(data[2]),int(data[3]),int(data[4]),int(data[5]),int(data[6])]
+        crop3D(img_name,bbox)
 
-    for bname in box_names:
-        if bname is in [".", ".."]:
-            continue
-
-        img_name = "" # TODO: GET THE NAME OF THE IMAGE
-        crop3D(img_name)
+    print("Complete cropping images ...")
 
     
-def dicom2rnn(img_name):
-    dicom_dir = os.path.join(TCIA_DIR,img_name)
+def dicom2nrrd(img_name,img_path):
+    dicom_dir = os.path.join(TCIA_DIR,img_path)
     nrrd_file = os.path.join(TEMP,img_name+".nrrd")
-
+    
     imreader = sitk.ImageSeriesReader()
     s_IDs    = imreader.GetGDCMSeriesIDs(dicom_dir)
 
@@ -139,7 +186,7 @@ def dicom2rnn(img_name):
         print(f"{dicom_dir} is not found!!!")
         return
 
-    files = reader.GetGDCMSeriesFileNames(dicom_dir, s_IDs[0])
+    files = imreader.GetGDCMSeriesFileNames(dicom_dir, s_IDs[0])
     imreader.SetFileNames(files)
     image = imreader.Execute()
 
@@ -149,14 +196,20 @@ def dicom2rnn(img_name):
     
     
 def extract():
-    freader = fopen(IMG_LIST,'r')
+    freader = open(IMG_LIST,'r')
     while True:
-        img_name = freader.readline()
-        if img_name is None or len(img_name)==0:
+        line = freader.readline()
+        if line is None or len(line)==0:
             break
 
         # convert dicom to rnn
-        dcom2rnn(img_name)
+        imname,impath = line.split(",")
+        print(f"Processing {imname} ... ")
+        #if not imname=="HN-CHUS-071":
+        #    continue
+        
+        dicom2nrrd(imname,impath.strip())
+        print(f"DICOM to .NRRD conversion completed!") 
         
         
 def clear():
@@ -177,7 +230,12 @@ def run():
     crop()        
 
     # Clear temporary data
-    clear()
+    answer  = input("Do you want to delete the full-size .nrrd files (Y/N)?")
+    if answer.lower()=="y" or answer.lower()=="yes":
+        clear()
 
 
-run()
+#run()
+
+#img_name = "HN-CHUS-071" # Select an image name 
+#show_slices(os.path.join(NRRD_DIR,img_name+"_Cropped_Volume.nrrd"))
