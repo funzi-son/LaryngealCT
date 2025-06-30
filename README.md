@@ -21,3 +21,20 @@ pip install SimpleITK pydicom pynrrd numpy
 python dataprep.py
 
 ### The result will be a set of cropped 3D images in .nrrd formats, stored in "cropped_nrrds" folder. We also provide the labels for classification to different stages in "data/annotations/LaryngealCT_metadata.xlsx". This would help to train a deep learning model.
+
+# Run deep learning models
+Management of laryngeal cancer relies greatly upon accurate staging. Advanced laryngeal cancer (stage T4) are most often managed by surgical removal of larynx and the other (non-T4) cases are given chemoradiotherapy. Hence, we attempted binary classification (T4 vs Non-T4) of laryngeal cancer in this benchmarking experiment. Preprocessing steps included Hounsfield Unit (HU) clipping in the range (-300,300), Z-score normalization and the cropped images were already resampled to 1mm voxel spacing. Six different data augmentations such as random affine transformations, elastic deformations, gamma correction, Gaussian noise and left-right flipping were done to improve the robustness of 434
+the model. All models were trained using the Focal Loss function to emphasize the minority (T4) class, with α=[1.0, 436
+4.0] and γ=2.0. Optimization was performed using Adam (learning rate = 1e-4), with early stopping (patience = 10 epochs) based on the best F1-score on the validation set five fold cross-validation technique was used to benchmark the performance of five 3D deep learning architectures—3D CNN, ResNet18, ResNet50, ResNet101, and DenseNet121on this binary classification of laryngeal cancer cases.
+
+We provide 5 examples for 5 different deep learning models, which can be found in the "classification" folder.
+
+3DCNN_benchmarking.ipynb
+
+DenseNet121_benchmarking_MICCAI.ipynb
+
+ResNet18_benchmarking.ipynb
+
+ResNet50_benchmarking.ipynb
+
+ResNet101_benchmarking.ipynb
