@@ -38,3 +38,5 @@ ResNet18_benchmarking.ipynb
 ResNet50_benchmarking.ipynb
 
 ResNet101_benchmarking.ipynb
+
+We also provide our trained models [here](https://drive.google.com/drive/folders/12GX54a3H0-f7VdbeWA9dXziWfezF80Fd?usp=sharing).
