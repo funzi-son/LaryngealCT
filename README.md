@@ -11,7 +11,7 @@ We select images from six datasets in the Cancer Image Archive https://www.cance
 After downloading RADCURE, Head-Neck-PET-CT, HEAD-NECK-RADIOMICS-HN1, HNSCC, Head-Neck-3DCT-RT, and QIN-HEADNECK, users should put them under the "data/tcia" folder. If the "tcia" folder does not exist under the "data" folder, please create one.
 
 
-NOTE: Make sure you place the downloaded TCIA data folder into the "data" directory and rename it as "tcia"
+NOTE: Make sure you place the downloaded TCIA data folder into the "data" directory and rename it as "tcia".
 
 ## Install dependencies
 
