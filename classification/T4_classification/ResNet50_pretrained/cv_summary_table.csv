@@ -1,0 +1,14 @@
+,Mean ± SD
+accuracy,0.114 ± 0.040
+balanced_accuracy,0.491 ± 0.011
+f1_macro,0.110 ± 0.043
+auc,0.506 ± 0.206
+precision_recall_auc,0.187 ± 0.118
+mcc,-0.016 ± 0.020
+brier,0.240 ± 0.014
+TN,6.200 ± 7.600
+FP,145.000 ± 7.348
+FN,0.800 ± 0.980
+TP,12.600 ± 1.020
+sensitivity,0.941 ± 0.073
+specificity,0.041 ± 0.050

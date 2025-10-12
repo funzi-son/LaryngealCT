@@ -1,0 +1,51 @@
+{
+  "raw_threshold": {
+    "accuracy": 0.9174757281553398,
+    "balanced_accuracy": 0.5802987861811391,
+    "f1_macro": 0.608583882865765,
+    "auc": 0.8773731714908185,
+    "precision_recall_auc": 0.4269081415108353,
+    "mcc": 0.26278690248142056,
+    "brier": 0.1060861942479104,
+    "TN": 186,
+    "FP": 3,
+    "FN": 14,
+    "TP": 3,
+    "sensitivity": 0.17647058823529413,
+    "specificity": 0.9841269841269841
+  },
+  "optimized_threshold": {
+    "accuracy": 0.8106796116504854,
+    "balanced_accuracy": 0.8432928727046374,
+    "f1_macro": 0.6605399923944734,
+    "auc": 0.8773731714908185,
+    "precision_recall_auc": 0.4269081415108353,
+    "mcc": 0.4348987036244111,
+    "brier": 0.1060861942479104,
+    "TN": 152,
+    "FP": 37,
+    "FN": 2,
+    "TP": 15,
+    "sensitivity": 0.8823529411764706,
+    "specificity": 0.8042328042328042
+  },
+  "calibrated": {
+    "accuracy": 0.18932038834951456,
+    "balanced_accuracy": 0.5582010582010581,
+    "f1_macro": 0.1888425172714626,
+    "auc": 0.8773731714908186,
+    "precision_recall_auc": 0.4269081415108352,
+    "mcc": 0.10370411449522635,
+    "brier": 0.21388662580954276,
+    "TN": 22,
+    "FP": 167,
+    "FN": 0,
+    "TP": 17,
+    "sensitivity": 1.0,
+    "specificity": 0.1164021164021164
+  },
+  "temperature": 14.332088470458984,
+  "optimal_threshold": 0.3706522583961487,
+  "tl_mode": "full",
+  "used_medicalnet": true
+}
