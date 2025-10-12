@@ -1,0 +1,2 @@
+Probs=[5.03e-43 1.00e+00]
+MassIn=0.0216 ROIfrac=0.0429 Enrich=0.50x
