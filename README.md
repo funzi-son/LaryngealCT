@@ -33,5 +33,5 @@ Preprocessing steps included Hounsfield Unit (HU) clipping in the range (-300,30
 
 We provide examples for 6 different deep learning models for each of the benchmarking tasks, which can be found in the "classification" folder. This folder contains the codes, cross validation, test and per-class metrics, model checkpoints for each model, along with ROC curves, Precision-Recall curves and confusion matrices.
 
-Explainable AI is gaining popularity in medical imaging, and we also attempted GradCAM++ visualizations for explainability of the best performing model for T4 classification task. Step-by-step codes, sample segmentation labels results are provided in the "GradCAM" sub-folder of "classification" folder.
+Explainable AI is gaining popularity in medical imaging, and we also attempted GradCAM++ visualizations for explainability of the best performing model for our T4 classification task. Step-by-step codes, sample segmentation labels and the results are provided in the "GradCAM" sub-folder of "classification" folder.
 
