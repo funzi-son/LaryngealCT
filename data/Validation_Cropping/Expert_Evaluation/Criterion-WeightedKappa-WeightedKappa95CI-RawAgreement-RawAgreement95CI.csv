@@ -1,0 +1,5 @@
+Criterion,Weighted Kappa,Weighted Kappa 95% CI,Raw Agreement (%),Raw Agreement 95% CI
+Anatomical_Coverage,1,"Perfect agreement, not estimable",100,"Perfect agreement, not estimable"
+Image_Quality,0.904,"(0.840, 0.957)",91,"(85.0, 96.0)"
+Segmentation_Feasibility,0.901,"(0.823, 0.942)",87,"(80.0, 93.0)"
+Classification_Feas.,0.936,"(0.854, 0.976)",93,"(88.0, 97.0)"

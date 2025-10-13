@@ -1,0 +1,5 @@
+Criterion,Dr_Devaraja_Mean,Dr_Prakashini_Mean,Pearson_r,Mean_Difference
+Anatomical Coverage,4.9,4.9,1,0
+Image Quality,4.58,4.61,0.906,-0.03
+Segmentation Suitability,4.65,4.58,0.913,0.07
+Classification Suitability,4.66,4.63,0.94,0.03

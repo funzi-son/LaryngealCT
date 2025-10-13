@@ -1,0 +1,5 @@
+Criterion,Dr_Devaraja_Mean,Dr_Devaraja_Median,Dr_Devaraja_StdDev,Dr_Devaraja_Mode,Dr_Devaraja_Mode_Freq,Dr_Prakashini_Mean,Dr_Prakashini_Median,Dr_Prakashini_StdDev,Dr_Prakashini_Mode,Dr_Prakashini_Mode_Freq
+Anatomical_Coverage,4.9,5,0.46,5,94,4.9,5,0.46,5,94
+Image_Quality,4.58,5,0.7,5,69,4.61,5,0.68,5,72
+Segmentation_Feasibility,4.65,5,0.76,5,76,4.58,5,0.87,5,77
+Classification_Feasibility,4.66,5,0.71,5,76,4.63,5,0.77,5,77
