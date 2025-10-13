@@ -1,0 +1,8 @@
+('HNSCC_01_0213', 'clamped_bbox', {'orig_size': (250, 250, 283), 'requested': (199, 156, 79, 146, 140, 81)})
+('HNSCC_01_0213', 'shape_mismatch', ((81, 94, 51), (81, 140, 146)))
+('HNSCC_01_0157', 'clamped_bbox', {'orig_size': (250, 250, 412), 'requested': (229, 194, 73, 123, 113, 24)})
+('HNSCC_01_0157', 'shape_mismatch', ((24, 56, 21), (24, 113, 123)))
+('HNSCC_01_0037', 'clamped_bbox', {'orig_size': (250, 250, 268), 'requested': (190, 135, 91, 140, 133, 77)})
+('HNSCC_01_0037', 'shape_mismatch', ((77, 115, 60), (77, 133, 140)))
+('HNSCC_01_0187', 'clamped_bbox', {'orig_size': (250, 250, 284), 'requested': (179, 170, 77, 152, 130, 86)})
+('HNSCC_01_0187', 'shape_mismatch', ((86, 80, 71), (86, 130, 152)))
