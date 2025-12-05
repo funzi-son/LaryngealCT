@@ -1,5 +1,5 @@
 # ==============================================================================
-# ResNet18 model for binary classification of early vs advanced laryngeal cancer
+# ResNet18 model for binary classification of T4 laryngeal cancer
 # ==============================================================================
 
 # =========================
@@ -28,11 +28,11 @@ from monai.networks.nets import resnet18
 # =========================
 IMAGE_DIR   = "path/to/your/Cropped_Volumes/dir"
 META_FILE   = "path/to/LaryngealCT_metadata.xlsx"
-TRAIN_SPLIT = "path/to/train_split_binary.xlsx"
-TEST_SPLIT  = "path/to/test_split_binary.xlsx"
+TRAIN_SPLIT = "path/to/train_split_T4.xlsx"
+TEST_SPLIT  = "path/to/test_split_T4.xlsx"
 OUTPUT_ROOT = "path/to/your/output/dir"
 
-LABEL_COL = "Binary_TisT1T2_vs_T3T4"
+LABEL_COL = "Label_T4"
 TARGET_SHAPE = (32, 96, 96)
 BATCH_SIZE   = 2
 ACCUM_STEPS  = 4       # 4 x 2 = effective batch 8 (no extra memory)
@@ -43,7 +43,7 @@ N_FOLDS      = 5
 SEED         = 42
 
 LOSS_TYPE   = "focal"   # "focal" or "wbce"
-FOCAL_ALPHA = 0.75      
+FOCAL_ALPHA = 8.0      
 FOCAL_GAMMA = 2.0
 
 NUM_WORKERS = 0         # Windows stability
@@ -415,5 +415,6 @@ pd.DataFrame({"TCIA_ID": tem["TCIA_ID"], "Filename": tem["Filename"],
 with open(Path(OUTPUT_ROOT)/"test_metrics_resnet18.json","w") as f:
     json.dump({"default":res_default, "topt":res_topt, "calibrated":res_cal,
                "t_opt":t_opt, "T":T}, f, indent=2)
+
 
 print("\nSaved test predictions and metrics in:", OUTPUT_ROOT)
