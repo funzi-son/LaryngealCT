@@ -1,1 +1,185 @@
+custom_boundary = r"""
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+import numpy as np
+
+from nnunetv2.training.nnUNetTrainer.nnUNetTrainer import nnUNetTrainer
+from nnunetv2.training.loss.compound_losses import DC_and_CE_loss, DC_and_BCE_loss
+from nnunetv2.training.loss.deep_supervision import DeepSupervisionWrapper
+from nnunetv2.training.loss.dice import MemoryEfficientSoftDiceLoss
+
+
+class SimpleBoundaryLoss(nn.Module):
+    '''
+    Very simple boundary-aware loss: morphological gradient + Dice on boundaries.
+    '''
+    def __init__(self, kernel_size: int = 3, eps: float = 1e-8):
+        super().__init__()
+        self.kernel_size = kernel_size
+        self.eps = eps
+
+    def _morph_gradient(self, one_hot):
+        k = self.kernel_size
+        pad = k // 2
+        max_pool = F.max_pool3d(one_hot, k, stride=1, padding=pad)
+        min_pool = -F.max_pool3d(-one_hot, k, stride=1, padding=pad)
+        grad = max_pool - min_pool
+        return (grad > 0).float()
+
+    def forward(self, net_output, target):
+        # target can be (B,1,Z,Y,X) or (B,Z,Y,X)
+        if target.ndim == 5 and target.shape[1] == 1:
+            target_labels = target[:, 0].long()
+        elif target.ndim == 4:
+            target_labels = target.long()
+        else:
+            raise RuntimeError(f"Bad target shape: {target.shape}")
+
+        num_classes = net_output.shape[1]
+        target_oh = F.one_hot(target_labels, num_classes).permute(0, 4, 1, 2, 3).float()
+
+        pred = torch.argmax(net_output, dim=1)
+        pred_oh = F.one_hot(pred, num_classes).permute(0, 4, 1, 2, 3).float()
+
+        b_gt = self._morph_gradient(target_oh)
+        b_pr = self._morph_gradient(pred_oh)
+
+        inter = (b_gt * b_pr).sum()
+        denom = b_gt.sum() + b_pr.sum() + self.eps
+        dice = (2 * inter + self.eps) / denom
+        return 1 - dice
+
+
+class nnUNetTrainer_DiceCEBoundary(nnUNetTrainer):
+    '''
+    Custom trainer: standard Dice+CE plus Boundary Loss.
+    '''
+    def _build_loss(self):
+        # nnU-Net default loss selection
+        if self.label_manager.has_regions:
+            base_loss = DC_and_BCE_loss(
+                {},
+                {'batch_dice': self.configuration_manager.batch_dice,
+                 'do_bg': True, 'smooth': 1e-5, 'ddp': self.is_ddp},
+                use_ignore_label=self.label_manager.ignore_label is not None,
+                dice_class=MemoryEfficientSoftDiceLoss,
+            )
+        else:
+            base_loss = DC_and_CE_loss(
+                {'batch_dice': self.configuration_manager.batch_dice,
+                 'smooth': 1e-5, 'do_bg': False, 'ddp': self.is_ddp},
+                {},
+                weight_ce=1.0,
+                weight_dice=1.0,
+                ignore_label=self.label_manager.ignore_label,
+                dice_class=MemoryEfficientSoftDiceLoss,
+            )
+
+        boundary_loss = SimpleBoundaryLoss(kernel_size=3)
+
+        class Combined(nn.Module):
+            def __init__(self, main, boundary, w=0.5):
+                super().__init__()
+                self.main = main
+                self.boundary = boundary
+                self.w = w
+
+            def forward(self, out, tgt):
+                return self.main(out, tgt) + self.w * self.boundary(out, tgt)
+
+        loss = Combined(base_loss, boundary_loss, w=0.5)
+
+        # Deep supervision handling
+        if self.enable_deep_supervision:
+            scales = self._get_deep_supervision_scales()
+            weights = np.array([1 / (2 ** i) for i in range(len(scales))])
+            weights[-1] = 0  # ignore lowest scale
+            weights /= weights.sum()
+            loss = DeepSupervisionWrapper(loss, weights)
+
+        return loss
+"""
+
+custom_tta = r"""
+import torch
+from torch.cuda.amp import autocast
+from .nnUNetTrainer_DiceCEBoundary import nnUNetTrainer_DiceCEBoundary
+
+
+class nnUNetTrainer_DiceCEBoundaryTTA(nnUNetTrainer_DiceCEBoundary):
+    '''
+    Dice+CE+Boundary loss + flip-consistency (self-ensembling) during training.
+    '''
+    consistency_weight = 0.1
+
+    def run_iteration(self, data_generator, do_backprop: bool = True, run_online_evaluation: bool = False):
+        data_dict = next(data_generator)
+        data = data_dict['data'].to(self.device, non_blocking=True)
+        target = data_dict['target'].to(self.device, non_blocking=True)
+
+        target_deep = self.prepare_for_deep_supervision(target) if self.enable_deep_supervision else target
+
+        self.optimizer.zero_grad(set_to_none=True)
+
+        if self.grad_scaler is not None:
+            with autocast(device_type='cuda', enabled=True):
+                output = self.network(data)
+                supervised_loss = self.loss(output, target_deep)
+
+                # Flip along X axis (B,C,Z,Y,X)
+                data_flip = torch.flip(data, dims=[4])
+                output_flip = self.network(data_flip)
+
+                out_main = output[0] if isinstance(output, (tuple, list)) else output
+                out_flip = output_flip[0] if isinstance(output_flip, (tuple, list)) else output_flip
+                out_flip_unflipped = torch.flip(out_flip, dims=[4])
+
+                p_main = torch.softmax(out_main, dim=1)
+                p_flip = torch.softmax(out_flip_unflipped, dim=1)
+
+                consistency_loss = torch.mean((p_main - p_flip) ** 2)
+                loss = supervised_loss + self.consistency_weight * consistency_loss
+
+            self.grad_scaler.scale(loss).backward()
+            self.grad_scaler.step(self.optimizer)
+            self.grad_scaler.update()
+        else:
+            output = self.network(data)
+            supervised_loss = self.loss(output, target_deep)
+
+            data_flip = torch.flip(data, dims=[4])
+            output_flip = self.network(data_flip)
+
+            out_main = output[0] if isinstance(output, (tuple, list)) else output
+            out_flip = output_flip[0] if isinstance(output_flip, (tuple, list)) else output_flip
+            out_flip_unflipped = torch.flip(out_flip, dims=[4])
+
+            p_main = torch.softmax(out_main, dim=1)
+            p_flip = torch.softmax(out_flip_unflipped, dim=1)
+
+            consistency_loss = torch.mean((p_main - p_flip) ** 2)
+            loss = supervised_loss + self.consistency_weight * consistency_loss
+
+            loss.backward()
+            self.optimizer.step()
+
+        if run_online_evaluation:
+            out_eval = output[0] if isinstance(output, (tuple, list)) else output
+            self.run_online_evaluation(out_eval, target)
+
+        return loss.detach().cpu().numpy()
+"""
+
+path_boundary = os.path.join(trainer_dir, "nnUNetTrainer_DiceCEBoundary.py")
+path_tta = os.path.join(trainer_dir, "nnUNetTrainer_DiceCEBoundaryTTA.py")
+
+with open(path_boundary, "w", encoding="utf-8") as f:
+    f.write(custom_boundary)
+
+with open(path_tta, "w", encoding="utf-8") as f:
+    f.write(custom_tta)
+
+print("Wrote:", path_boundary)
+print("Wrote:", path_tta)
 
