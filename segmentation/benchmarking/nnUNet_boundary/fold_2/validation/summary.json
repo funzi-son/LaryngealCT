@@ -1,0 +1,186 @@
+{
+    "foreground_mean": {
+        "Dice": 0.8838362707597487,
+        "FN": 522.7,
+        "FP": 487.0,
+        "IoU": 0.7929361927918146,
+        "TN": 128979.3,
+        "TP": 4179.0,
+        "n_pred": 4666.0,
+        "n_ref": 4701.7
+    },
+    "mean": {
+        "1": {
+            "Dice": 0.8838362707597487,
+            "FN": 522.7,
+            "FP": 487.0,
+            "IoU": 0.7929361927918146,
+            "TN": 128979.3,
+            "TP": 4179.0,
+            "n_pred": 4666.0,
+            "n_ref": 4701.7
+        }
+    },
+    "metric_per_case": [
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.8868213660245184,
+                    "FN": 521,
+                    "FP": 513,
+                    "IoU": 0.7966568338249754,
+                    "TN": 126169,
+                    "TP": 4051,
+                    "n_pred": 4564,
+                    "n_ref": 4572
+                }
+            },
+            "prediction_file": "/content/drive/MyDrive/RQ2/LarynxCTSeg/nnUNet_results/Dataset001_LarynxCT/nnUNetTrainer_DiceCEBoundary__nnUNetPlans__3d_fullres/fold_2/validation/MLLC0012.nii.gz",
+            "reference_file": "/content/drive/MyDrive/RQ2/LarynxCTSeg/nnUNet_preprocessed/Dataset001_LarynxCT/gt_segmentations/MLLC0012.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.8931048317762366,
+                    "FN": 1655,
+                    "FP": 210,
+                    "IoU": 0.8068558409279205,
+                    "TN": 164224,
+                    "TP": 7791,
+                    "n_pred": 8001,
+                    "n_ref": 9446
+                }
+            },
+            "prediction_file": "/content/drive/MyDrive/RQ2/LarynxCTSeg/nnUNet_results/Dataset001_LarynxCT/nnUNetTrainer_DiceCEBoundary__nnUNetPlans__3d_fullres/fold_2/validation/MLLC0162.nii.gz",
+            "reference_file": "/content/drive/MyDrive/RQ2/LarynxCTSeg/nnUNet_preprocessed/Dataset001_LarynxCT/gt_segmentations/MLLC0162.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.8990063613900425,
+                    "FN": 591,
+                    "FP": 1330,
+                    "IoU": 0.8165409225479897,
+                    "TN": 211529,
+                    "TP": 8550,
+                    "n_pred": 9880,
+                    "n_ref": 9141
+                }
+            },
+            "prediction_file": "/content/drive/MyDrive/RQ2/LarynxCTSeg/nnUNet_results/Dataset001_LarynxCT/nnUNetTrainer_DiceCEBoundary__nnUNetPlans__3d_fullres/fold_2/validation/MLLC0290.nii.gz",
+            "reference_file": "/content/drive/MyDrive/RQ2/LarynxCTSeg/nnUNet_preprocessed/Dataset001_LarynxCT/gt_segmentations/MLLC0290.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.8739946380697051,
+                    "FN": 106,
+                    "FP": 646,
+                    "IoU": 0.7761904761904762,
+                    "TN": 86540,
+                    "TP": 2608,
+                    "n_pred": 3254,
+                    "n_ref": 2714
+                }
+            },
+            "prediction_file": "/content/drive/MyDrive/RQ2/LarynxCTSeg/nnUNet_results/Dataset001_LarynxCT/nnUNetTrainer_DiceCEBoundary__nnUNetPlans__3d_fullres/fold_2/validation/MLLC0496.nii.gz",
+            "reference_file": "/content/drive/MyDrive/RQ2/LarynxCTSeg/nnUNet_preprocessed/Dataset001_LarynxCT/gt_segmentations/MLLC0496.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.8991945959989608,
+                    "FN": 341,
+                    "FP": 435,
+                    "IoU": 0.8168515459051215,
+                    "TN": 141887,
+                    "TP": 3461,
+                    "n_pred": 3896,
+                    "n_ref": 3802
+                }
+            },
+            "prediction_file": "/content/drive/MyDrive/RQ2/LarynxCTSeg/nnUNet_results/Dataset001_LarynxCT/nnUNetTrainer_DiceCEBoundary__nnUNetPlans__3d_fullres/fold_2/validation/MLLC0882.nii.gz",
+            "reference_file": "/content/drive/MyDrive/RQ2/LarynxCTSeg/nnUNet_preprocessed/Dataset001_LarynxCT/gt_segmentations/MLLC0882.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.8379366368805848,
+                    "FN": 256,
+                    "FP": 542,
+                    "IoU": 0.7210765466620063,
+                    "TN": 117199,
+                    "TP": 2063,
+                    "n_pred": 2605,
+                    "n_ref": 2319
+                }
+            },
+            "prediction_file": "/content/drive/MyDrive/RQ2/LarynxCTSeg/nnUNet_results/Dataset001_LarynxCT/nnUNetTrainer_DiceCEBoundary__nnUNetPlans__3d_fullres/fold_2/validation/MLLC0892.nii.gz",
+            "reference_file": "/content/drive/MyDrive/RQ2/LarynxCTSeg/nnUNet_preprocessed/Dataset001_LarynxCT/gt_segmentations/MLLC0892.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.9231373781829614,
+                    "FN": 526,
+                    "FP": 452,
+                    "IoU": 0.8572471172091666,
+                    "TN": 121909,
+                    "TP": 5873,
+                    "n_pred": 6325,
+                    "n_ref": 6399
+                }
+            },
+            "prediction_file": "/content/drive/MyDrive/RQ2/LarynxCTSeg/nnUNet_results/Dataset001_LarynxCT/nnUNetTrainer_DiceCEBoundary__nnUNetPlans__3d_fullres/fold_2/validation/MLLC0906.nii.gz",
+            "reference_file": "/content/drive/MyDrive/RQ2/LarynxCTSeg/nnUNet_preprocessed/Dataset001_LarynxCT/gt_segmentations/MLLC0906.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.8976711362032463,
+                    "FN": 112,
+                    "FP": 468,
+                    "IoU": 0.8143405889884763,
+                    "TN": 124676,
+                    "TP": 2544,
+                    "n_pred": 3012,
+                    "n_ref": 2656
+                }
+            },
+            "prediction_file": "/content/drive/MyDrive/RQ2/LarynxCTSeg/nnUNet_results/Dataset001_LarynxCT/nnUNetTrainer_DiceCEBoundary__nnUNetPlans__3d_fullres/fold_2/validation/MLLC0962.nii.gz",
+            "reference_file": "/content/drive/MyDrive/RQ2/LarynxCTSeg/nnUNet_preprocessed/Dataset001_LarynxCT/gt_segmentations/MLLC0962.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.8982910694597575,
+                    "FN": 543,
+                    "FP": 195,
+                    "IoU": 0.8153615211408557,
+                    "TN": 106897,
+                    "TP": 3259,
+                    "n_pred": 3454,
+                    "n_ref": 3802
+                }
+            },
+            "prediction_file": "/content/drive/MyDrive/RQ2/LarynxCTSeg/nnUNet_results/Dataset001_LarynxCT/nnUNetTrainer_DiceCEBoundary__nnUNetPlans__3d_fullres/fold_2/validation/MLLC0977.nii.gz",
+            "reference_file": "/content/drive/MyDrive/RQ2/LarynxCTSeg/nnUNet_preprocessed/Dataset001_LarynxCT/gt_segmentations/MLLC0977.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.8292046936114733,
+                    "FN": 576,
+                    "FP": 79,
+                    "IoU": 0.7082405345211581,
+                    "TN": 88763,
+                    "TP": 1590,
+                    "n_pred": 1669,
+                    "n_ref": 2166
+                }
+            },
+            "prediction_file": "/content/drive/MyDrive/RQ2/LarynxCTSeg/nnUNet_results/Dataset001_LarynxCT/nnUNetTrainer_DiceCEBoundary__nnUNetPlans__3d_fullres/fold_2/validation/MLLC1017.nii.gz",
+            "reference_file": "/content/drive/MyDrive/RQ2/LarynxCTSeg/nnUNet_preprocessed/Dataset001_LarynxCT/gt_segmentations/MLLC1017.nii.gz"
+        }
+    ]
+}
