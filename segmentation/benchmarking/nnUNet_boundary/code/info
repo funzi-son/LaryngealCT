@@ -1,1 +1,182 @@
+#####################################################################
+Code used to train the nnUNet_boundary_loss model (on Google Colab)
+[Please run in separate cells, as marked by ###]
+#####################################################################
 
+#Installing dependencies
+!pip install -q "nnunetv2>=2.5.2" "acvl-utils[full]" simpleitk scipy
+
+#####################################################################
+#mounting GDrive
+from google.colab import drive
+drive.mount('/content/drive')
+
+#####################################################################
+#Setting environment variables
+import os, pathlib
+
+base = "/content/drive/MyDrive/RQ2/LarynxCTSeg"   # <- change according to your folder name
+
+os.environ["nnUNet_raw"] = os.path.join(base, "nnUNet_raw")
+os.environ["nnUNet_preprocessed"] = os.path.join(base, "nnUNet_preprocessed")
+os.environ["nnUNet_results"] = os.path.join(base, "nnUNet_results")
+
+for v in ["nnUNet_raw", "nnUNet_preprocessed", "nnUNet_results"]:
+    os.makedirs(os.environ[v], exist_ok=True)
+
+print("nnUNet_raw       =", os.environ["nnUNet_raw"])
+print("nnUNet_preprocessed =", os.environ["nnUNet_preprocessed"])
+print("nnUNet_results   =", os.environ["nnUNet_results"])
+
+######################################################################
+#Preprocessing
+!nnUNetv2_plan_and_preprocess -d 1 -c 3d_fullres --verify_dataset_integrity
+
+######################################################################
+#Add a custom trainer with Dice+CE+Boundary loss
+#Now we create a new trainer class inside the installed nnUNetv2 package so the CLI can see it.
+#Create the trainer file
+#this writes a new file nnUNetTrainer_DiceCEBoundary.py into nnUNetv2
+
+custom_trainer_code = r"""
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+import numpy as np
+
+from nnunetv2.training.nnUNetTrainer.nnUNetTrainer import nnUNetTrainer
+from nnunetv2.training.loss.compound_losses import DC_and_CE_loss, DC_and_BCE_loss
+from nnunetv2.training.loss.deep_supervision import DeepSupervisionWrapper
+from nnunetv2.training.loss.dice import MemoryEfficientSoftDiceLoss
+
+
+class SimpleBoundaryLoss(nn.Module):
+    '''
+    Very simple boundary-aware loss.
+    Applies a morphological gradient and computes Dice loss on boundaries.
+    '''
+    def __init__(self, kernel_size: int = 3, eps: float = 1e-8):
+        super().__init__()
+        self.kernel_size = kernel_size
+        self.eps = eps
+
+    def _morph_gradient(self, one_hot):
+        k = self.kernel_size
+        pad = k // 2
+        max_pool = F.max_pool3d(one_hot, k, stride=1, padding=pad)
+        min_pool = -F.max_pool3d(-one_hot, k, stride=1, padding=pad)
+        grad = max_pool - min_pool
+        return (grad > 0).float()
+
+    def forward(self, net_output, target):
+        if target.ndim == 5 and target.shape[1] == 1:
+            target_labels = target[:, 0].long()
+        elif target.ndim == 4:
+            target_labels = target.long()
+        else:
+            raise RuntimeError(f"Bad target shape: {target.shape}")
+
+        num_classes = net_output.shape[1]
+
+        # Ground truth one-hot
+        target_oh = F.one_hot(target_labels, num_classes).permute(0,4,1,2,3).float()
+
+        # Predicted one-hot
+        pred = torch.argmax(net_output, dim=1)
+        pred_oh = F.one_hot(pred, num_classes).permute(0,4,1,2,3).float()
+
+        # Boundary maps
+        b_gt = self._morph_gradient(target_oh)
+        b_pr = self._morph_gradient(pred_oh)
+
+        inter = (b_gt * b_pr).sum()
+        denom = b_gt.sum() + b_pr.sum() + self.eps
+        dice = (2*inter + self.eps) / denom
+        return 1 - dice
+
+
+class nnUNetTrainer_DiceCEBoundary(nnUNetTrainer):
+    '''
+    Custom trainer: standard Dice+CE plus Boundary Loss.
+    Only overrides _build_loss().
+    '''
+    def _build_loss(self):
+        # Default nnU-Net loss
+        if self.label_manager.has_regions:
+            base_loss = DC_and_BCE_loss(
+                {},
+                {'batch_dice': self.configuration_manager.batch_dice,
+                 'do_bg': True, 'smooth': 1e-5, 'ddp': self.is_ddp},
+                use_ignore_label=self.label_manager.ignore_label is not None,
+                dice_class=MemoryEfficientSoftDiceLoss,
+            )
+        else:
+            base_loss = DC_and_CE_loss(
+                {'batch_dice': self.configuration_manager.batch_dice,
+                 'smooth': 1e-5, 'do_bg': False, 'ddp': self.is_ddp},
+                {},
+                weight_ce=1.0,
+                weight_dice=1.0,
+                ignore_label=self.label_manager.ignore_label,
+                dice_class=MemoryEfficientSoftDiceLoss,
+            )
+
+        # Boundary loss
+        boundary_loss = SimpleBoundaryLoss(kernel_size=3)
+
+        class Combined(nn.Module):
+            def __init__(self, main, boundary, w=0.5):
+                super().__init__()
+                self.main = main
+                self.boundary = boundary
+                self.w = w
+
+            def forward(self, out, tgt):
+                return self.main(out, tgt) + self.w * self.boundary(out, tgt)
+
+        loss = Combined(base_loss, boundary_loss, w=0.5)
+
+        # Deep supervision
+        if self.enable_deep_supervision:
+            scales = self._get_deep_supervision_scales()
+            weights = np.array([1 / (2**i) for i in range(len(scales))])
+            weights[-1] = 0  # lowest scale ignored
+            weights /= weights.sum()
+
+            loss = DeepSupervisionWrapper(loss, weights)
+
+        return loss
+"""
+
+
+# Write trainer file
+path = "/usr/local/lib/python3.12/dist-packages/nnunetv2/training/nnUNetTrainer/nnUNetTrainer_DiceCEBoundary.py"
+with open(path, "w") as f:
+    f.write(custom_trainer_code)
+
+print("Trainer created successfully →", path)
+
+###########################################################################
+#Model training
+#Run one fold at a time
+!nnUNetv2_train 001 3d_fullres 0 -tr nnUNetTrainer_DiceCEBoundary -device cuda
+!nnUNetv2_train 001 3d_fullres 1 -tr nnUNetTrainer_DiceCEBoundary -device cuda
+!nnUNetv2_train 001 3d_fullres 2 -tr nnUNetTrainer_DiceCEBoundary -device cuda
+!nnUNetv2_train 001 3d_fullres 3 -tr nnUNetTrainer_DiceCEBoundary -device cuda
+!nnUNetv2_train 001 3d_fullres 4 -tr nnUNetTrainer_DiceCEBoundary -device cuda
+
+###########################################################################
+#Model Testing (prediction on SeedB)
+#Please modify the folder names accordingly
+
+!nnUNetv2_predict -d 1 -c 3d_fullres -f 0 1 2 3 4 -tr nnUNetTrainer_DiceCEBoundary -i /content/drive/MyDrive/RQ2/LarynxCTSeg/nnUNet_raw/Dataset001_LarynxCT/imagesTs -o /content/drive/MyDrive/RQ2/LarynxCTSeg/nnUNet_predictions/seedB_DiceCEBoundary_ensemble
+
+#############################################################################
+#Testing on HanSeg
+!nnUNetv2_predict -d 1 -c 3d_fullres -f 0 1 2 3 4 -tr nnUNetTrainer_DiceCEBoundary -i /content/drive/MyDrive/RQ2/LarynxCTSeg/nnUNet_raw/Dataset001_LarynxCT/HanSeg -o /content/drive/MyDrive/RQ2/LarynxCTSeg/nnUNet_predictions/HanSeg_DiceCEBoundary_ensemble_probs --save_probabilities
+
+###########################################################################
+#Saving probabilities to compute entropy
+#Please modify the folder names accordingly
+
+!nnUNetv2_predict -d 1 -c 3d_fullres -f 0 1 2 3 4 -tr nnUNetTrainer_DiceCEBoundary -i /content/drive/MyDrive/RQ2/LarynxCTSeg/nnUNet_raw/Dataset001_LarynxCT/imagesTs -o /content/drive/MyDrive/RQ2/LarynxCTSeg/nnUNet_predictions/seedB_DiceCEBoundary_ensemble_probs --save_probabilities
