@@ -1,0 +1,7 @@
+Dataset,Model,OverallWinCount
+SeedB,Baseline,22
+SeedB,Boundary,12
+SeedB,BC_nnUNet,16
+HanSeg,Baseline,10
+HanSeg,Boundary,13
+HanSeg,BC_nnUNet,19

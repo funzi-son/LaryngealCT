@@ -1,0 +1,13 @@
+Dataset,Model,Metric,Threshold,OutlierCount
+SeedB,Baseline,HD95_mm,10.0,1
+SeedB,Baseline,ASSD_mm,1.0,1
+SeedB,Boundary,HD95_mm,10.0,1
+SeedB,Boundary,ASSD_mm,1.0,1
+SeedB,BC_nnUNet,HD95_mm,10.0,1
+SeedB,BC_nnUNet,ASSD_mm,1.0,1
+HanSeg,Baseline,HD95_mm,10.0,9
+HanSeg,Baseline,ASSD_mm,1.0,5
+HanSeg,Boundary,HD95_mm,10.0,6
+HanSeg,Boundary,ASSD_mm,1.0,5
+HanSeg,BC_nnUNet,HD95_mm,10.0,5
+HanSeg,BC_nnUNet,ASSD_mm,1.0,5

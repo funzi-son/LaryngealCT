@@ -1,0 +1,4 @@
+,Model,WinCount_mean,WinCount_CI95_low,WinCount_CI95_high,WinRate_mean,WinRate_CI95_low,WinRate_CI95_high,MeanRankSum_mean,MeanRankSum_CI95_low,MeanRankSum_CI95_high
+0,Baseline,22.0302,15.0,29.0,0.440604,0.3,0.58,16.883194,15.75975,18.05025
+1,Boundary,11.97,6.0,18.0,0.2394,0.12,0.36,18.405520000000003,17.39,19.43
+2,BC_nnUNet,15.9998,10.0,23.0,0.319996,0.2,0.46,18.711285999999998,17.53,19.92
