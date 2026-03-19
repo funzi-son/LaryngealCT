@@ -1,0 +1,153 @@
+#first import all dependencies, torch, nnunetv2 and set environment variables as required (mentioned in nnUNet documentation available at https://github.com/MIC-DKFZ/nnUNet/blob/master/documentation/resenc_presets.md)
+#run in spearate cells as marked
+
+###########################################
+
+#set path and environment variables
+
+import os
+import subprocess
+
+# ------------------------------------
+# 1. Set paths (EDIT THESE accordingly)
+# ------------------------------------
+nnUNet_raw = r"C:\Users\your_folder_name\LarynxCTSeg\nnUNet_raw"
+nnUNet_preprocessed = r"C:\Users\your_folder_name\LarynxCTSeg\nnUNet_preprocessed"
+nnUNet_results = r"C:\Users\your_folder_name\LarynxCTSeg\nnUNet_results"
+
+# ------------------------------------
+# 2. Set environment variables (for this notebook only)
+# ------------------------------------
+os.environ["nnUNet_raw"] = nnUNet_raw
+os.environ["nnUNet_preprocessed"] = nnUNet_preprocessed
+os.environ["nnUNet_results"] = nnUNet_results
+
+print("\nEnvironment variables set:")
+print("nnUNet_raw =", os.environ["nnUNet_raw"])
+print("nnUNet_preprocessed =", os.environ["nnUNet_preprocessed"])
+print("nnUNet_results =", os.environ["nnUNet_results"])
+
+##################################################################
+
+#create json file
+
+import os
+from nnunetv2.dataset_conversion.generate_dataset_json import generate_dataset_json
+
+# ==== CHANGE THIS IF YOUR PATH IS DIFFERENT ====
+output_folder = r"your\path\nnUNet_raw\Dataset001_LarynxCT"
+# ===============================================
+
+# Single-channel input (CT)
+channel_names = {
+    0: "CT"
+}
+
+# Binary labels: background=0, thyroid cartilage=1
+labels = {
+    "background": 0,
+    "thyroid_cartilage": 1
+}
+
+file_ending = ".nii.gz"
+
+# Count training cases based on imagesTr
+imagesTr_dir = os.path.join(output_folder, "imagesTr")
+num_training_cases = len(
+    [f for f in os.listdir(imagesTr_dir) if f.endswith("_0000.nii.gz")]
+)
+
+print(f"Found {num_training_cases} training cases in imagesTr")
+
+generate_dataset_json(
+    output_folder=output_folder,
+    channel_names=channel_names,
+    labels=labels,
+    num_training_cases=num_training_cases,
+    file_ending=file_ending,
+    dataset_name="LarynxCT_ThyroidCartilage",
+    description="Thyroid cartilage segmentation dataset (Seed A training, Seed B testing) for laryngeal cancer CT"
+)
+
+print(f"Created dataset.json in {output_folder}")
+
+###################################################################
+
+#perform dependency check
+
+import torch
+import platform
+import importlib.util
+import os
+
+print("🔍 System & Package Compatibility Check for nnUNet v2")
+print("---------------------------------------------------")
+
+# 1. Python Version
+print(f"🧠 Python version: {platform.python_version()}")
+
+# 2. Check PyTorch and CUDA
+print(f"⚙️ PyTorch version: {torch.__version__}")
+print(f"💻 CUDA available: {torch.cuda.is_available()}")
+
+if torch.cuda.is_available():
+    print(f"🚀 CUDA version: {torch.version.cuda}")
+    print(f"🧠 cuDNN version: {torch.backends.cudnn.version()}")
+    print(f"📦 Number of GPUs: {torch.cuda.device_count()}")
+    for i in range(torch.cuda.device_count()):
+        print(f"   - GPU {i}: {torch.cuda.get_device_name(i)} ({round(torch.cuda.get_device_properties(i).total_memory / 1024**3, 2)} GB)")
+else:
+    print("⚠️ CUDA not available. Make sure you installed PyTorch with CUDA support.")
+
+# 3. MONAI Check
+monai_installed = importlib.util.find_spec("monai") is not None
+print(f"📦 MONAI installed: {monai_installed}")
+if monai_installed:
+    import monai
+    print(f"   - MONAI version: {monai.__version__}")
+
+# 4. nnUNet Check
+nnunet_installed = importlib.util.find_spec("nnunetv2") is not None
+print(f"📦 nnUNet v2 installed: {nnunet_installed}")
+if nnunet_installed:
+    import nnunetv2
+    print(f"   - nnUNet v2 module path: {os.path.dirname(nnunetv2.__file__)}")
+
+# 5. Torch Info
+print(f"🔧 Torch compiled with CUDA: {torch.version.cuda is not None}")
+print(f"🔧 cuDNN enabled: {torch.backends.cudnn.enabled}")
+
+print("✅ Dependency check complete.")
+
+##########################################################
+
+#preprocessing
+
+!nnUNetv2_plan_and_preprocess -d 001 -c 3d_fullres --verify_dataset_integrity
+
+############################################################
+
+#model trainig
+#run in separate cells
+
+!nnUNetv2_train 001 3d_fullres 0
+!nnUNetv2_train 001 3d_fullres 1
+!nnUNetv2_train 001 3d_fullres 2
+!nnUNetv2_train 001 3d_fullres 3
+!nnUNetv2_train 001 3d_fullres 4
+
+#############################################################
+
+#testing(prediction) on Seed B and HanSeg
+
+!nnUNetv2_predict -d 1 -c 3d_fullres -f 0 1 2 3 4 -i C:\Users\your_folder_name\LarynxCTSeg\nnUNet_raw\Dataset001_LarynxCT\imagesTs -o C:\Users\your_folder_name\LarynxCTSeg\predictions\SeedB\baseline_ensemble
+
+!nnUNetv2_predict -d 1 -c 3d_fullres -f 0 1 2 3 4 -i C:\Users\your_folder_name\LarynxCTSeg\nnUNet_raw\Dataset001_LarynxCT\HanSeg -o C:\Users\your_folder_name\LarynxCTSeg\predictions\HanSeg\baseline_ensemble
+
+#############################################################
+
+#save probabilities
+
+!nnUNetv2_predict -d 1 -c 3d_fullres -f 0 1 2 3 4 -i C:\Users\your_folder_name\LarynxCTSeg\nnUNet_raw\Dataset001_LarynxCT\imagesTs -o C:\Users\your_folder_name\LarynxCTSeg\predictions\SeedB\baseline_ensemble_probs --save_probabilities
+
+!nnUNetv2_predict -d 1 -c 3d_fullres -f 0 1 2 3 4 -i C:\Users\your_folder_name\LarynxCTSeg\nnUNet_raw\Dataset001_LarynxCT\HanSeg -o C:\Users\your_folder_name\LarynxCTSeg\predictions\HanSeg\baseline_ensemble_probs --save_probabilities
