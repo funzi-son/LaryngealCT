@@ -1,0 +1,186 @@
+{
+    "foreground_mean": {
+        "Dice": 0.8310960182036219,
+        "FN": 3337.9,
+        "FP": 2375.5,
+        "IoU": 0.7213314215056934,
+        "TN": 461746.6,
+        "TP": 8975.9,
+        "n_pred": 11351.4,
+        "n_ref": 12313.8
+    },
+    "mean": {
+        "1": {
+            "Dice": 0.8310960182036219,
+            "FN": 3337.9,
+            "FP": 2375.5,
+            "IoU": 0.7213314215056934,
+            "TN": 461746.6,
+            "TP": 8975.9,
+            "n_pred": 11351.4,
+            "n_ref": 12313.8
+        }
+    },
+    "metric_per_case": [
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.9147480594658598,
+                    "FN": 647,
+                    "FP": 649,
+                    "IoU": 0.842890047278458,
+                    "TN": 205276,
+                    "TP": 6953,
+                    "n_pred": 7602,
+                    "n_ref": 7600
+                }
+            },
+            "prediction_file": "C:\\Users\\clarynse\\LarynxCTSeg\\nnUNet_results\\Dataset001_LarynxCT\\nnUNetTrainer__nnUNetPlans__3d_fullres\\fold_4\\validation\\MLLC0059.nii.gz",
+            "reference_file": "C:\\Users\\clarynse\\LarynxCTSeg\\nnUNet_preprocessed\\Dataset001_LarynxCT\\gt_segmentations\\MLLC0059.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.9058412122782024,
+                    "FN": 446,
+                    "FP": 281,
+                    "IoU": 0.8278882575757576,
+                    "TN": 192606,
+                    "TP": 3497,
+                    "n_pred": 3778,
+                    "n_ref": 3943
+                }
+            },
+            "prediction_file": "C:\\Users\\clarynse\\LarynxCTSeg\\nnUNet_results\\Dataset001_LarynxCT\\nnUNetTrainer__nnUNetPlans__3d_fullres\\fold_4\\validation\\MLLC0923.nii.gz",
+            "reference_file": "C:\\Users\\clarynse\\LarynxCTSeg\\nnUNet_preprocessed\\Dataset001_LarynxCT\\gt_segmentations\\MLLC0923.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.8931375399825531,
+                    "FN": 756,
+                    "FP": 714,
+                    "IoU": 0.80690923420465,
+                    "TN": 187435,
+                    "TP": 6143,
+                    "n_pred": 6857,
+                    "n_ref": 6899
+                }
+            },
+            "prediction_file": "C:\\Users\\clarynse\\LarynxCTSeg\\nnUNet_results\\Dataset001_LarynxCT\\nnUNetTrainer__nnUNetPlans__3d_fullres\\fold_4\\validation\\MLLC0960.nii.gz",
+            "reference_file": "C:\\Users\\clarynse\\LarynxCTSeg\\nnUNet_preprocessed\\Dataset001_LarynxCT\\gt_segmentations\\MLLC0960.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.7605467556145731,
+                    "FN": 15496,
+                    "FP": 7225,
+                    "IoU": 0.6136147200870689,
+                    "TN": 1374936,
+                    "TP": 36083,
+                    "n_pred": 43308,
+                    "n_ref": 51579
+                }
+            },
+            "prediction_file": "C:\\Users\\clarynse\\LarynxCTSeg\\nnUNet_results\\Dataset001_LarynxCT\\nnUNetTrainer__nnUNetPlans__3d_fullres\\fold_4\\validation\\MLLC0963.nii.gz",
+            "reference_file": "C:\\Users\\clarynse\\LarynxCTSeg\\nnUNet_preprocessed\\Dataset001_LarynxCT\\gt_segmentations\\MLLC0963.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.8680916290556075,
+                    "FN": 374,
+                    "FP": 1175,
+                    "IoU": 0.7669274751730364,
+                    "TN": 326930,
+                    "TP": 5097,
+                    "n_pred": 6272,
+                    "n_ref": 5471
+                }
+            },
+            "prediction_file": "C:\\Users\\clarynse\\LarynxCTSeg\\nnUNet_results\\Dataset001_LarynxCT\\nnUNetTrainer__nnUNetPlans__3d_fullres\\fold_4\\validation\\MLLC0972.nii.gz",
+            "reference_file": "C:\\Users\\clarynse\\LarynxCTSeg\\nnUNet_preprocessed\\Dataset001_LarynxCT\\gt_segmentations\\MLLC0972.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.5824248263272653,
+                    "FN": 14039,
+                    "FP": 10666,
+                    "IoU": 0.4108599227357276,
+                    "TN": 1657426,
+                    "TP": 17229,
+                    "n_pred": 27895,
+                    "n_ref": 31268
+                }
+            },
+            "prediction_file": "C:\\Users\\clarynse\\LarynxCTSeg\\nnUNet_results\\Dataset001_LarynxCT\\nnUNetTrainer__nnUNetPlans__3d_fullres\\fold_4\\validation\\MLLC0978.nii.gz",
+            "reference_file": "C:\\Users\\clarynse\\LarynxCTSeg\\nnUNet_preprocessed\\Dataset001_LarynxCT\\gt_segmentations\\MLLC0978.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.817503729487817,
+                    "FN": 552,
+                    "FP": 182,
+                    "IoU": 0.6913372582001682,
+                    "TN": 84072,
+                    "TP": 1644,
+                    "n_pred": 1826,
+                    "n_ref": 2196
+                }
+            },
+            "prediction_file": "C:\\Users\\clarynse\\LarynxCTSeg\\nnUNet_results\\Dataset001_LarynxCT\\nnUNetTrainer__nnUNetPlans__3d_fullres\\fold_4\\validation\\MLLC1022.nii.gz",
+            "reference_file": "C:\\Users\\clarynse\\LarynxCTSeg\\nnUNet_preprocessed\\Dataset001_LarynxCT\\gt_segmentations\\MLLC1022.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.9046454767726161,
+                    "FN": 469,
+                    "FP": 857,
+                    "IoU": 0.8258928571428571,
+                    "TN": 219184,
+                    "TP": 6290,
+                    "n_pred": 7147,
+                    "n_ref": 6759
+                }
+            },
+            "prediction_file": "C:\\Users\\clarynse\\LarynxCTSeg\\nnUNet_results\\Dataset001_LarynxCT\\nnUNetTrainer__nnUNetPlans__3d_fullres\\fold_4\\validation\\MLLC1028.nii.gz",
+            "reference_file": "C:\\Users\\clarynse\\LarynxCTSeg\\nnUNet_preprocessed\\Dataset001_LarynxCT\\gt_segmentations\\MLLC1028.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.8017113707421425,
+                    "FN": 229,
+                    "FP": 976,
+                    "IoU": 0.6690469651194727,
+                    "TN": 186164,
+                    "TP": 2436,
+                    "n_pred": 3412,
+                    "n_ref": 2665
+                }
+            },
+            "prediction_file": "C:\\Users\\clarynse\\LarynxCTSeg\\nnUNet_results\\Dataset001_LarynxCT\\nnUNetTrainer__nnUNetPlans__3d_fullres\\fold_4\\validation\\MLLC1037.nii.gz",
+            "reference_file": "C:\\Users\\clarynse\\LarynxCTSeg\\nnUNet_preprocessed\\Dataset001_LarynxCT\\gt_segmentations\\MLLC1037.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.8623095823095823,
+                    "FN": 371,
+                    "FP": 1030,
+                    "IoU": 0.7579474775397373,
+                    "TN": 183437,
+                    "TP": 4387,
+                    "n_pred": 5417,
+                    "n_ref": 4758
+                }
+            },
+            "prediction_file": "C:\\Users\\clarynse\\LarynxCTSeg\\nnUNet_results\\Dataset001_LarynxCT\\nnUNetTrainer__nnUNetPlans__3d_fullres\\fold_4\\validation\\MLLC1039.nii.gz",
+            "reference_file": "C:\\Users\\clarynse\\LarynxCTSeg\\nnUNet_preprocessed\\Dataset001_LarynxCT\\gt_segmentations\\MLLC1039.nii.gz"
+        }
+    ]
+}
