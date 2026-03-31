@@ -1,5 +1,5 @@
 # =======================================================
-# DenseNet121 model for early vs advanced classification
+# DenseNet121 model for T4 classification
 # =======================================================
 
 # =========================
