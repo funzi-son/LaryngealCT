@@ -1,6 +1,6 @@
-==================================================
-Ensemble test inference script for DenseNet121
-==================================================
+#==================================================
+# Ensemble test inference script for DenseNet121
+#==================================================
 
 import os, json
 from pathlib import Path
