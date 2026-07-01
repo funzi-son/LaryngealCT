@@ -1,7 +1,7 @@
-# =========================
+# ==================================
+# Ensemble test inference for 3DCNN
+# ==================================
 # Install (if needed) and imports
-# =========================
-
 # If you don't have torchio installed in this environment, uncomment:
 # !pip install torchio SimpleITK
 
