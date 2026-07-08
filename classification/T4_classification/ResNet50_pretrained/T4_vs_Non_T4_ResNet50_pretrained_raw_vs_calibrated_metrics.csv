@@ -1,0 +1,3 @@
+Model,Threshold,Precision,Recall,Sensitivity,Specificity,TN,FP,FN,TP
+Raw ensemble,0.5,0.0,0.0,0.0,1.0,189,0,17,0
+Calibrated ensemble,0.3124338060617447,0.0825242718446602,1.0,1.0,0.0,0,189,0,17
