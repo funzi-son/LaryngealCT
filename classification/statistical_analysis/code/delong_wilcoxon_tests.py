@@ -119,7 +119,7 @@ for m1 in models.keys():
 delong_csv = Path(r"D:\RQ1\MICCAI\stats\delong_matrix.csv")
 delong_csv.parent.mkdir(parents=True, exist_ok=True)
 delong_matrix.to_csv(delong_csv)
-print(f"✅ DeLong p-values saved to {delong_csv}")
+print(f"DeLong p-values saved to {delong_csv}")
 
 # Plot Heatmap
 plt.figure(figsize=(8,6))
@@ -156,7 +156,7 @@ for met in metrics:
     # Save CSV per metric
     csv_path = delong_csv.parent / f"wilcoxon_{met}.csv"
     wilcoxon_results[met].to_csv(csv_path)
-    print(f"✅ Wilcoxon {met} p-values saved to {csv_path}")
+    print(f"Wilcoxon {met} p-values saved to {csv_path}")
 
     # Heatmap per metric
     plt.figure(figsize=(8,6))
