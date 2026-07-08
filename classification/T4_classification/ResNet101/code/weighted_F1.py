@@ -7,14 +7,14 @@ import numpy as np
 from sklearn.metrics import f1_score
 
 # Path to your predictions file
-csv_path = "path/to/test_predictions_resnet101.csv"
+csv_path = r"path\to\Ensemble\T4_Classification\ResNet101\T4_vs_Non_T4_ResNet101_ensemble_predictions.csv"
 
 # Load predictions
 df = pd.read_csv(csv_path)
 
 # True labels and calibrated probabilities
-y_true = df['Label'].values
-p_cal = df['Calibrated_Probability'].values
+y_true = df['y'].values
+p_cal = df['prob_cal'].values
 
 # Convert probabilities to predicted labels (threshold 0.5)
 y_pred = (p_cal >= 0.5).astype(int)
