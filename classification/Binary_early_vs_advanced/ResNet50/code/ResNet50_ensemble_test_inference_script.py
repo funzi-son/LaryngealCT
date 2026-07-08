@@ -1,3 +1,7 @@
+#=========================================
+#ResNet50 ensemble test inference script
+#=========================================
+
 import os
 import json
 from pathlib import Path
