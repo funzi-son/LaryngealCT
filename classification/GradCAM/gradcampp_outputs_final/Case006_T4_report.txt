@@ -1,6 +1,0 @@
-Mean probabilities = [0.5422543  0.45774564]
-Mean predicted class = 0
-MassInROI = 0.026214
-ROI Fraction = 0.029154
-Enrichment = 0.90x
-Per-fold preds = [0, 0, 0, 0, 0]
