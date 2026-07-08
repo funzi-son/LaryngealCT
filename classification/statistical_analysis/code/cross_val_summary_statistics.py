@@ -18,7 +18,7 @@ cv_summary_path = Path("path/to/cv_summary_*modelname*.json")
 with open(cv_summary_path, "r") as f:
     folds = json.load(f)
 
-print(f"✅ Loaded {len(folds)} folds from {cv_summary_path}")
+print(f"Loaded {len(folds)} folds from {cv_summary_path}")
 
 # -------------------
 # Collect per-fold metrics (use calibrated metrics at t_opt)
@@ -49,7 +49,7 @@ for col in df.columns:
 
 summary_df = pd.DataFrame(summary_stats, index=["Mean ± SD"]).T
 
-print("\n✅ Cross-validation summary (Mean ± SD):")
+print("\n Cross-validation summary (Mean ± SD):")
 display(summary_df)
 
 # -------------------
@@ -61,4 +61,4 @@ summary_df.to_csv(out_dir / "cv_summary_table.csv")
 with open(out_dir / "cv_summary_table.tex", "w") as f:
     f.write(summary_df.to_latex())
 
-print(f"\n📂 Saved summary to:\n- {out_dir/'cv_summary_table.csv'}\n- {out_dir/'cv_summary_table.tex'}")
+print(f"\n Saved summary to:\n- {out_dir/'cv_summary_table.csv'}\n- {out_dir/'cv_summary_table.tex'}")
