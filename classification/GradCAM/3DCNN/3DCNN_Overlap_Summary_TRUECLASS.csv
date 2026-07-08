@@ -1,0 +1,5 @@
+,CAM_Mask_OverlapFraction,CAM_Mask_OverlapFraction,Mask_CoverageRatio,Mask_CoverageRatio,Dice_CAM_Mask,Dice_CAM_Mask,Enrichment,Enrichment
+,mean,std,mean,std,mean,std,mean,std
+true_group,,,,,,,,
+T4,0.035937607,0.013239639,0.275076,0.053291433,0.060654055,0.020403787,1.3043627,0.25445968
+non-T4,0.040855277,0.025068214,0.36357608,0.17118688,0.071597606,0.0424458,1.6061392,0.42565137

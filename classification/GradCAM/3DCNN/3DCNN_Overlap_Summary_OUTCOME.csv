@@ -1,0 +1,6 @@
+,CAM_Mask_OverlapFraction,CAM_Mask_OverlapFraction,Mask_CoverageRatio,Mask_CoverageRatio,Dice_CAM_Mask,Dice_CAM_Mask,Enrichment,Enrichment
+,mean,std,mean,std,mean,std,mean,std
+outcome_type,,,,,,,,
+FN,0.04325132,0.005443679,0.265361,0.07150991,0.07132946,0.012200138,1.2781415,0.35408217
+FP,0.040855277,0.025068214,0.36357608,0.17118688,0.071597606,0.0424458,1.6061392,0.42565137
+TP,0.021310182,,0.29450598,,0.039303247,,1.3568048,
