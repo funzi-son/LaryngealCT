@@ -1,80 +1,77 @@
 # ===================================================
 # Code to calculate and save per-class metrics
 # ===================================================
-import json, csv
+import json
 import numpy as np
+import pandas as pd
 from pathlib import Path
-from sklearn.metrics import roc_auc_score, precision_recall_curve, auc, confusion_matrix
+from sklearn.metrics import (
+    confusion_matrix, precision_score, recall_score, f1_score,
+    roc_auc_score, average_precision_score
+)
 
-OUTPUT_ROOT="path/to/your/output/dir"
+# ======= Paths and config (3D-CNN, T4) =======
+output_root = Path(r"path\to\Ensemble\T4_Classification\3DCNN")
+pred_path   = output_root / "T4_vs_nonT4_Custom3DCNN_ensemble_predictions.csv"
+metrics_path = output_root / "T4_vs_nonT4_Custom3DCNN_ensemble_test_metrics.json"
 
-# Load predictions if not in memory
-preds_file = Path(OUTPUT_ROOT) / "test_predictions_custom3dcnn.csv"  
-df_preds = pd.read_csv(preds_file)
+# For reference only; we use prob_cal and thresholds from metrics JSON
+df = pd.read_csv(pred_path)
+with open(metrics_path, "r") as f:
+    mjson = json.load(f)
 
-test_labels = df_preds["Label"].values
-test_probs = df_preds["Probability"].values
-test_probs_cal = df_preds["Calibrated_Probability"].values
+y_true   = df["y"].astype(int).values
+prob_raw = df["prob_raw"].values
+prob_cal = df["prob_cal"].values
 
-# Load threshold + temperature info from your saved fold summary
-fold_summary = json.load(open(Path(OUTPUT_ROOT) / "cv_summary_custom3dcnn.json"))
-best_fold = max(fold_summary, key=lambda x: x["val_cal"]["f1_macro"])
-optimal_threshold = best_fold["t_opt"]
-temperature = best_fold["T"]
+topt_ens = float(mjson["t_opt_ens"])   # ensemble t_opt
+print("Using ensemble t_opt:", topt_ens)
 
-# ---- Per-class metrics function ----
-def per_class_metrics(y_true, y_prob, threshold=0.5):
-    y_pred = (y_prob >= threshold).astype(int)
-    tn, fp, fn, tp = confusion_matrix(y_true, y_pred).ravel()
+def compute_row(y, prob, thr, row_label):
+    """
+    Compute a full row for the per-class table:
+    - confusion matrix TN,FP,FN,TP
+    - per-class precision/recall/F1 for class 0 and 1
+    - ROC AUC, PR AUC for reference
+    """
+    y_pred = (prob >= thr).astype(int)
+    tn, fp, fn, tp = confusion_matrix(y, y_pred, labels=[0,1]).ravel()
 
-    # Class 1 (positive, e.g., T4 / Advanced)
-    precision_1 = tp / (tp + fp) if (tp + fp) > 0 else 0
-    recall_1 = tp / (tp + fn) if (tp + fn) > 0 else 0
-    f1_1 = 2 * precision_1 * recall_1 / (precision_1 + recall_1) if (precision_1 + recall_1) > 0 else 0
+    # Class 0 metrics
+    prec0 = precision_score(y, y_pred, labels=[0], average=None, zero_division=0)[0]
+    rec0  = recall_score(y, y_pred,   labels=[0], average=None, zero_division=0)[0]
+    f10   = f1_score(y, y_pred,       labels=[0], average=None, zero_division=0)[0]
 
-    # Class 0 (negative, e.g., Non-T4 / Early)
-    precision_0 = tn / (tn + fn) if (tn + fn) > 0 else 0
-    recall_0 = tn / (tn + fp) if (tn + fp) > 0 else 0
-    f1_0 = 2 * precision_0 * recall_0 / (precision_0 + recall_0) if (precision_0 + recall_0) > 0 else 0
+    # Class 1 metrics
+    prec1 = precision_score(y, y_pred, labels=[1], average=None, zero_division=0)[0]
+    rec1  = recall_score(y, y_pred,   labels=[1], average=None, zero_division=0)[0]
+    f11   = f1_score(y, y_pred,       labels=[1], average=None, zero_division=0)[0]
 
-    # Clinical metrics
-    TPR = recall_1  # sensitivity
-    TNR = recall_0  # specificity
-    FPR = fp / (fp + tn) if (fp + tn) > 0 else 0
-    FNR = fn / (fn + tp) if (fn + tp) > 0 else 0
-    PPV = precision_1
-    NPV = tn / (tn + fn) if (tn + fn) > 0 else 0
-
-    # Curves
-    roc_auc = roc_auc_score(y_true, y_prob)
-    precision_curve, recall_curve, _ = precision_recall_curve(y_true, y_prob)
-    pr_auc = auc(recall_curve, precision_curve)
+    rocauc = roc_auc_score(y, prob)
+    prauc  = average_precision_score(y, prob)
 
     return {
-        "precision_0": precision_0, "recall_0": recall_0, "f1_0": f1_0,
-        "precision_1": precision_1, "recall_1": recall_1, "f1_1": f1_1,
-        "TPR": TPR, "TNR": TNR, "FPR": FPR, "FNR": FNR, "PPV": PPV, "NPV": NPV,
-        "roc_auc": roc_auc, "pr_auc": pr_auc
+        "row": row_label,
+        "threshold": thr,
+        "TN": tn, "FP": fp, "FN": fn, "TP": tp,
+        "precision_0": prec0, "recall_0": rec0, "f1_0": f10,
+        "precision_1": prec1, "recall_1": rec1, "f1_1": f11,
+        "roc_auc": rocauc, "pr_auc": prauc,
     }
 
-# ---- Compute metrics ----
-metrics_perclass = {
-    "raw@0.5": per_class_metrics(test_labels, test_probs, threshold=0.5),
-    "uncalibrated@t_opt": per_class_metrics(test_labels, test_probs, threshold=optimal_threshold),
-    "calibrated@t_opt": per_class_metrics(test_labels, test_probs_cal, threshold=optimal_threshold),
-}
+rows = []
 
-# ---- Save JSON ----
-with open(Path(OUTPUT_ROOT) / "per_class_metrics_custom3dcnn.json", "w") as f:
-    json.dump(metrics_perclass, f, indent=2)
+# 1) Raw @ 0.5
+rows.append(compute_row(y_true, prob_raw, 0.5, row_label="Raw@0.5"))
 
-# ---- Save CSV ----
-csv_save_path = Path(OUTPUT_ROOT) / "per_class_metrics_custom3dcnn.csv"
-with open(csv_save_path, mode="w", newline="") as f_csv:
-    writer = csv.writer(f_csv)
-    writer.writerow(["mode", "metric", "value"])
-    for mode, dct in metrics_perclass.items():
-        for k, v in dct.items():
-            writer.writerow([mode, k, v])
+# 2) Calibrated @ 0.5
+rows.append(compute_row(y_true, prob_cal, 0.5, row_label="Cal@0.5"))
 
-print(f"✅ Saved per-class metrics:\n- {csv_save_path}\n- {OUTPUT_ROOT}/per_class_metrics_custom3dcnn.json")
+# 3) Calibrated @ t_opt_ens (this is what you’ll usually use for the “Cal.” row)
+rows.append(compute_row(y_true, prob_cal, topt_ens, row_label="Cal@topt_ens"))
+
+df_rows = pd.DataFrame(rows)
+out_csv = output_root / "T4_vs_nonT4_Custom3DCNN_per_class_from_ensemble.csv"
+df_rows.to_csv(out_csv, index=False)
+print("Saved per-class table rows to:", out_csv)
+print(df_rows)
