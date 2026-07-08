@@ -1,5 +1,5 @@
 # ==============================================================
-# Code to calculate Precision, Reacll, Sensitivity, Specificity
+# Code to calculate Precision, Recall, Sensitivity, Specificity
 # ==============================================================
 import pandas as pd
 import json
